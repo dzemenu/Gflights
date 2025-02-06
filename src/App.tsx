@@ -1,16 +1,18 @@
-import { CssBaseline, ThemeProvider } from "@mui/material";
+import { CssBaseline, ThemeProvider, Box } from "@mui/material";
 import Home from "./components/Home";
-import NightModeToggle from "./components/NightModeToggle";
 import { useThemeContext } from "./theme/ThemeContextProvider";
+import AppBar from "./components/AppBar";
 
 function App() {
   const { theme } = useThemeContext();
 
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={theme} >
       <CssBaseline />
-      <NightModeToggle />
-      <Home />
+      <AppBar />
+      <Box sx={{ mt: 8, overflowY: "auto", height: "calc(100vh - 64px)" }}>
+        <Home />
+      </Box>
     </ThemeProvider>
   );
 }

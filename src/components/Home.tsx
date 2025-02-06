@@ -1,35 +1,63 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
-  TextField,
   Button,
   MenuItem,
-  InputAdornment,
-  IconButton,
   Select,
   FormControl,
   InputLabel,
   Grid,
+  CircularProgress,
 } from "@mui/material";
-import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import SearchIcon from "@mui/icons-material/Search";
 
 import "../App.css";
 import CustomDatePicker from "./datePicker";
 import { Dayjs } from "dayjs";
+import AirPortAutoComplete from "./AirPortAutoComplete";
+import { useSearchFlightsQuery } from "../store/flightSlice";
+import FlightCard from "./FlightCard";
+import transformItineraries from "./helper";
 
 const Home = () => {
-  const [from, setFrom] = useState("Addis Ababa");
-  const [to, setTo] = useState("");
+  const [from, setFrom] = useState<any | null>(null);
+  const [to, setTo] = useState<any | null>(null);
   const [departure, setDeparture] = useState<Dayjs | null>(null);
   const [returnDate, setReturnDate] = useState<Dayjs | null>(null);
   const [tripType, setTripType] = useState("round-trip");
   const [passengers, setPassengers] = useState(1);
   const [classType, setClassType] = useState("economy");
+  const [searchParams, setSearchParams] = useState<any | null>(null);
 
-  const handleChange = (setter) => (e) => {
-    setter(e.target.value);
+  const { data, error, isLoading } = useSearchFlightsQuery(searchParams, {
+    skip: !searchParams, // Prevents query execution until search is clicked
+  });
+  const handleSearch = () => {
+    if (!from || !to || !departure) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    setSearchParams({
+      originSkyId: from.id,
+      destinationSkyId: to.id,
+      originEntityId: from.entityId,
+      destinationEntityId: to.entityId,
+      date: departure.format("YYYY-MM-DD"),
+      returnDate: returnDate ? returnDate.format("YYYY-MM-DD") : undefined,
+      cabinClass: classType,
+      adults: passengers,
+      sortBy: "best",
+      currency: "USD",
+      market: "en-US",
+      countryCode: "US",
+    });
   };
+  useEffect(() => {}, [data, searchParams]);
+  const transformedFlights = data?.data.itineraries
+    ? transformItineraries(data.data.itineraries)
+    : [];
+
   return (
     <Box
       display="flex"
@@ -51,7 +79,10 @@ const Home = () => {
         boxShadow={1}
       >
         <FormControl>
-          <Select value={tripType} onChange={handleChange(setTripType)}>
+          <Select
+            value={tripType}
+            onChange={(e) => setTripType(e.target.value)}
+          >
             <MenuItem value="round-trip">Round trip</MenuItem>
             <MenuItem value="one-way">One way</MenuItem>
           </Select>
@@ -59,15 +90,23 @@ const Home = () => {
 
         <FormControl>
           <InputLabel>Passengers</InputLabel>
-          <Select value={passengers} onChange={handleChange(setPassengers)}>
-            <MenuItem value={1}>1</MenuItem>
-            <MenuItem value={2}>2</MenuItem>
-            <MenuItem value={3}>3</MenuItem>
+          <Select
+            value={passengers}
+            onChange={(e) => setPassengers(Number(e.target.value))}
+          >
+            {[1, 2, 3, 4, 5].map((num) => (
+              <MenuItem key={num} value={num}>
+                {num}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
 
         <FormControl>
-          <Select value={classType} onChange={handleChange(setClassType)}>
+          <Select
+            value={classType}
+            onChange={(e) => setClassType(e.target.value)}
+          >
             <MenuItem value="economy">Economy</MenuItem>
             <MenuItem value="business">Business</MenuItem>
             <MenuItem value="first">First Class</MenuItem>
@@ -77,41 +116,21 @@ const Home = () => {
         {/* Form Inputs Section */}
         <Grid container spacing={2} justifyContent="center">
           <Grid item xs={12} sm={6} md={4} lg={3}>
-            <TextField
+            <AirPortAutoComplete
               label="From"
-              value={from}
-              onChange={handleChange(setFrom)}
-              variant="outlined"
-              fullWidth
-              slotProps={{
-                input: {
-                  endAdornment: (
-                    <InputAdornment
-                      position="end"
-                      sx={{
-                        transform: "translateX(100%)",
-                        display: { xs: "none", sm: "inline-flex" },
-                      }}
-                    >
-                      <IconButton>
-                        <SwapHorizIcon />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                },
-              }}
+              selectedAirport={from}
+              setSelectedAirport={setFrom}
             />
           </Grid>
 
           <Grid item xs={12} sm={6} md={4} lg={3}>
-            <TextField
-              label="Where to?"
-              value={to}
-              onChange={handleChange(setTo)}
-              variant="outlined"
-              fullWidth
+            <AirPortAutoComplete
+              label="Where to"
+              selectedAirport={to}
+              setSelectedAirport={setTo}
             />
           </Grid>
+
           <Grid item xs={12} sm={6} md={4} lg={3}>
             <CustomDatePicker
               label="Departure date"
@@ -119,7 +138,8 @@ const Home = () => {
               onChange={setDeparture}
             />
           </Grid>
-          {tripType == "round-trip" && (
+
+          {tripType === "round-trip" && (
             <Grid item xs={12} sm={6} md={4} lg={3}>
               <CustomDatePicker
                 label="Return date"
@@ -130,9 +150,27 @@ const Home = () => {
           )}
         </Grid>
 
-        <Button variant="contained" color="primary" startIcon={<SearchIcon />}>
-          Explore
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<SearchIcon />}
+          onClick={handleSearch}
+        >
+          Search
         </Button>
+      </Box>
+
+      {/* Search Results */}
+      <Box mt={4} width="80%">
+        {isLoading && <CircularProgress />}
+        {error && <p style={{ color: "red" }}>Error fetching flights.</p>}
+        {transformedFlights.length > 0 ? (
+          transformedFlights.map((flight, index) => (
+            <FlightCard key={index} {...flight} />
+          ))
+        ) : (
+          <p>No flights found.</p>
+        )}
       </Box>
     </Box>
   );
