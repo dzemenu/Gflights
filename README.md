@@ -1,50 +1,26 @@
-# React + TypeScript + Vite
+# **Responsive Google Flights Clone (React)**
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is a responsive version of Google Flights built using **React**, **Material-UI (MUI)**, and powered by the **Sky Scrapper API** from RapidAPI. The app allows users to search for flights.
 
-Currently, two official plugins are available:
+## **Features**
+- **Flight Search**: Search for flights by entering departure and destination locations, travel dates, and the number of passengers.
+- **Responsive Design**: Fully responsive interface that adjusts seamlessly across all device sizes (mobile, tablet, desktop).
+- **Flight Listings**: Displays flight results with details such as airline, price, departure time, and travel duration.
+- **Material UI (MUI)**: Designed using Material UI components for a sleek and modern look.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## **Technologies Used**
+- **React**: JavaScript library for building user interfaces.
+- **Material-UI (MUI)**: React components that implement Google's Material Design.
+- **Sky Scrapper API**: Provides flight data via RapidAPI.
+- **Axios**: For making HTTP requests to the Sky Scrapper API.
 
-## Expanding the ESLint configuration
+## **Setup & Installation**
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
-
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/dzemenu/Gflights.git
+1. **Add env file**:
+     Add 
+     VITE_FLIGHTS_URL=https://sky-scrapper.p.rapidapi.com/api/v1/flights
+     VITE_FLIGHTS_URL_V2=https://sky-scrapper.p.rapidapi.com/api/v2/flights
+     VITE_FLIGHTS_API_KEY=
