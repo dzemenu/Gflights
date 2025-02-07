@@ -8,7 +8,12 @@ import {
   InputLabel,
   Grid,
   CircularProgress,
+  Snackbar,
+  SnackbarCloseReason,
+  IconButton,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+
 import SearchIcon from "@mui/icons-material/Search";
 
 import "../App.css";
@@ -28,13 +33,15 @@ const Home = () => {
   const [passengers, setPassengers] = useState(1);
   const [classType, setClassType] = useState("economy");
   const [searchParams, setSearchParams] = useState<any | null>(null);
+  const [open, setOpen] = React.useState(false);
 
   const { data, error, isLoading } = useSearchFlightsQuery(searchParams, {
-    skip: !searchParams, // Prevents query execution until search is clicked
+    skip: !searchParams,
   });
   const handleSearch = () => {
     if (!from || !to || !departure) {
-      alert("Please fill in all required fields.");
+      setOpen(true);
+      //alert("Please fill in all required fields.");
       return;
     }
 
@@ -57,7 +64,28 @@ const Home = () => {
   const transformedFlights = data?.data.itineraries
     ? transformItineraries(data.data.itineraries)
     : [];
+  const handleClose = (
+    event: React.SyntheticEvent | Event,
+    reason?: SnackbarCloseReason
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
 
+    setOpen(false);
+  };
+  const action = (
+    <React.Fragment>
+      <IconButton
+        size="small"
+        aria-label="close"
+        color="inherit"
+        onClick={handleClose}
+      >
+        <CloseIcon fontSize="small" />
+      </IconButton>
+    </React.Fragment>
+  );
   return (
     <Box
       display="flex"
@@ -66,7 +94,6 @@ const Home = () => {
       gap={2}
       className="App"
     >
-      {/* Select Options Section */}
       <Box
         display="flex"
         flexWrap="wrap"
@@ -113,7 +140,6 @@ const Home = () => {
           </Select>
         </FormControl>
 
-        {/* Form Inputs Section */}
         <Grid container spacing={2} justifyContent="center">
           <Grid item xs={12} sm={6} md={4} lg={3}>
             <AirPortAutoComplete
@@ -160,7 +186,6 @@ const Home = () => {
         </Button>
       </Box>
 
-      {/* Search Results */}
       <Box mt={4} width="80%">
         {isLoading && <CircularProgress />}
         {error && <p style={{ color: "red" }}>Error fetching flights.</p>}
@@ -169,9 +194,16 @@ const Home = () => {
             <FlightCard key={index} {...flight} />
           ))
         ) : (
-          <p>No flights found.</p>
+          <p></p>
         )}
       </Box>
+      <Snackbar
+        open={open}
+        autoHideDuration={1500}
+        onClose={handleClose}
+        message="Please fill in all required fields."
+        action={action}
+      />
     </Box>
   );
 };
