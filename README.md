@@ -12,7 +12,7 @@ This project is a responsive version of Google Flights built using **React**, **
 - **React**: JavaScript library for building user interfaces.
 - **Material-UI (MUI)**: React components that implement Google's Material Design.
 - **Sky Scrapper API**: Provides flight data via RapidAPI.
-- **Axios**: For making HTTP requests to the Sky Scrapper API.
+- **Redux RTK**: For making HTTP requests to the Sky Scrapper API.
 
 ## **Setup & Installation**
 
